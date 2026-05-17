@@ -52,9 +52,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add content/pages content/images content/topics.json || true
+          git add content/pages content/images content/topics.json autopost.db || true
           git diff --cached --quiet || git commit -m "Auto-generate next VK post"
           git push
 
       - name: Publish due posts to VK
-        run: python -c "from app.publisher_service import publish_due_posts; publish_due_posts()"
+        run: python -c "from app.db import init_db; from app.publisher_service import publish_due_posts; init_db(); publish_due_posts()"
