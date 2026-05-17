@@ -1,0 +1,4 @@
+﻿requests
+APScheduler
+Jinja2
+python-dotenv

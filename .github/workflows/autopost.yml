@@ -1,0 +1,60 @@
+name: VK Auto Post
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 7 * * *'
+    - cron: '0 9 * * *'
+    - cron: '0 11 * * *'
+    - cron: '0 13 * * *'
+    - cron: '0 15 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  autopost:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Create .env from secrets
+        run: |
+          cat > .env <<EOF
+          VK_GROUP_ID=${{ secrets.VK_GROUP_ID }}
+          VK_USER_TOKEN=${{ secrets.VK_USER_TOKEN }}
+          VK_COMMUNITY_TOKEN=${{ secrets.VK_COMMUNITY_TOKEN }}
+          GITHUB_REPOSITORY=${{ github.repository }}
+          GITHUB_PAGES_BASE_URL=https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+          FORGETAPI_API_KEY=${{ secrets.FORGETAPI_API_KEY }}
+          FORGETAPI_BASE_URL=${{ secrets.FORGETAPI_BASE_URL }}
+          FORGETAPI_MODEL=${{ secrets.FORGETAPI_MODEL }}
+          EOF
+
+      - name: Generate next post
+        run: python create_ai_post.py
+
+      - name: Publish generated page and images to GitHub
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content/pages content/images content/topics.json || true
+          git diff --cached --quiet || git commit -m "Auto-generate next VK post"
+          git push
+
+      - name: Publish due posts to VK
+        run: python -c "from app.scheduler_service import publish_due_posts; publish_due_posts()"
