@@ -2,3 +2,4 @@
 APScheduler
 Jinja2
 python-dotenv
+openai>=1.0.0
