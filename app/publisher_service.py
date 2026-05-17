@@ -1,33 +1,39 @@
 ﻿import logging
-import sqlite3
+
+from app.db import get_connection
 from app.vk_api import post_to_wall
 
 logger = logging.getLogger(__name__)
 
 
 def publish_due_posts():
-    conn = sqlite3.connect(r"data\posts.db")
+    conn = get_connection()
     cur = conn.cursor()
 
-    cur.execute("""
+    cur.execute(
+        """
         SELECT id, message, link_url, image_path
         FROM posts
         WHERE status = 'pending'
           AND publish_at <= datetime('now', 'localtime')
         ORDER BY publish_at ASC
-    """)
+        """
+    )
 
     posts = cur.fetchall()
     processed = 0
 
     for row in posts:
-        local_id = row[0]
-        message = row[1]
-        link_url = row[2]
-        image_path = row[3]
+        local_id = row["id"]
+        message = row["message"]
+        link_url = row["link_url"]
+        image_path = row["image_path"]
 
         try:
-            print(f"DEBUG_POST local_id={local_id} image_path={image_path} link_url={link_url}")
+            print(
+                f"DEBUG_POST local_id={local_id} "
+                f"image_path={image_path} link_url={link_url}"
+            )
 
             response = post_to_wall(
                 message=message,

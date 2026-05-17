@@ -52,7 +52,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add content/pages content/images content/topics.json autopost.db || true
+          git add content/pages content/images content/topics.json data/posts.db || true
           git diff --cached --quiet || git commit -m "Auto-generate next VK post"
           git push
 
