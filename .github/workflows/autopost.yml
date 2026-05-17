@@ -57,4 +57,4 @@ jobs:
           git push
 
       - name: Publish due posts to VK
-        run: python -c "from app.scheduler_service import publish_due_posts; publish_due_posts()"
+        run: python -c "from app.publisher_service import publish_due_posts; publish_due_posts()"
