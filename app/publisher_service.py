@@ -15,8 +15,7 @@ def publish_due_posts():
         SELECT id, message, link_url, image_path
         FROM posts
         WHERE status = 'pending'
-          AND publish_at <= datetime('now', 'localtime')
-        ORDER BY publish_at ASC
+        ORDER BY id ASC
         """
     )
 
