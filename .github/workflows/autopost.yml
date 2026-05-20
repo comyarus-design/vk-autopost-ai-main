@@ -1,4 +1,4 @@
-name: VK Auto Post
+﻿name: VK Auto Post
 
 on:
   workflow_dispatch:
@@ -35,9 +35,6 @@ jobs:
       - name: Create .env from secrets
         run: |
           cat > .env <<EOF
-          VK_GROUP_ID=${{ secrets.VK_GROUP_ID }}
-          VK_USER_TOKEN=${{ secrets.VK_USER_TOKEN }}
-          VK_COMMUNITY_TOKEN=${{ secrets.VK_COMMUNITY_TOKEN }}
           GITHUB_REPOSITORY=${{ github.repository }}
           GITHUB_PAGES_BASE_URL=https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
           FORGETAPI_API_KEY=${{ secrets.FORGETAPI_API_KEY }}
@@ -52,9 +49,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add content/pages content/images content/topics.json data/posts.db || true
+          git add content/pages content/images content/topics.json data/posts.db
           git diff --cached --quiet || git commit -m "Auto-generate next VK post"
           git push
-
-      - name: Publish due posts to VK
-        run: python -c "from app.db import init_db; from app.publisher_service import publish_due_posts; init_db(); publish_due_posts()"
